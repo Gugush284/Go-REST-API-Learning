@@ -16,7 +16,25 @@ func New(config *Config) *APIserver {
 	}
 }
 
+// Set log level ...
+func (s *APIserver) configureLogger() error {
+	level, err := logrus.ParseLevel(s.config.LogLevel)
+	if err != nil {
+		return err
+	}
+
+	s.logger.SetLevel(level)
+
+	return nil
+}
+
 // Start server ...
 func (s *APIserver) Start() error {
+	if err := s.configureLogger(); err != nil {
+		return err
+	}
+
+	s.logger.Info("starting api server")
+
 	return nil
 }

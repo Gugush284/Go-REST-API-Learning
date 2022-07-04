@@ -6,7 +6,6 @@ import (
 
 	"github.com/BurntSushi/toml"
 	"github.com/Gugush284/Go-server.git/internal/app/apiserver"
-	_ "github.com/go-sql-driver/mysql"
 )
 
 var configPath string
@@ -24,7 +23,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	s := apiserver.New(nil)
+	s := apiserver.New(config)
 	if err := s.Start(); err != nil {
 		log.Fatal(err)
 	}

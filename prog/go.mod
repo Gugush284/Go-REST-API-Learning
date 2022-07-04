@@ -2,8 +2,6 @@ module github.com/Gugush284/Go-server.git
 
 go 1.18
 
-require github.com/go-sql-driver/mysql v1.6.0
-
 require (
 	github.com/BurntSushi/toml v1.1.0 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
