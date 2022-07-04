@@ -1,14 +1,12 @@
 package main
 
 import (
-	"database/sql"
-	"fmt"
 	"net/http"
 
 	_ "github.com/go-sql-driver/mysql"
 )
 
-type Stop struct {
+/*type Stop struct {
 	ID    int
 	Title string
 }
@@ -31,12 +29,6 @@ func Read_db() []Stop {
 	defer sql_database.Close()
 	fmt.Println("Подключение создано")
 
-	/*statement, err := sql_database.Prepare("CREATE TABLE IF NOT EXIST people (id INTEGER PRIMARY KEY, name TEXT)")
-	if err != nil {
-		panic(err)
-	}
-	statement.Exec()*/
-
 	var stop []Stop
 
 	rows, err := sql_database.Query("SELECT _id, name FROM stopsker")
@@ -55,7 +47,7 @@ func Read_db() []Stop {
 	}
 
 	return stop
-}
+}*/
 
 func main() {
 

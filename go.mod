@@ -1,4 +1,4 @@
-module sql
+module github.com/Gugush284/Go-server.git
 
 go 1.18
 
