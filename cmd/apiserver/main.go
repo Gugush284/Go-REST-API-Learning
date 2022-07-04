@@ -1,56 +1,31 @@
 package main
 
 import (
-	"net/http"
+	"flag"
+	"log"
 
+	"github.com/BurntSushi/toml"
+	"github.com/Gugush284/Go-server.git/internal/app/apiserver"
 	_ "github.com/go-sql-driver/mysql"
 )
 
-/*type Stop struct {
-	ID    int
-	Title string
+var configPath string
+
+func init() {
+	flag.StringVar(&configPath, "comfig-path", "configs/apiserver.toml", "path to config file")
 }
-
-func getid(w http.ResponseWriter, r *http.Request) {
-
-	stop := Read_db()
-
-	for i := 0; i < len(stop); i++ {
-		fmt.Fprintf(w, "%d - %s\n", stop[i].ID, stop[i].Title)
-	}
-}
-
-func Read_db() []Stop {
-	sql_database, err := sql.Open("mysql", "root:root@tcp(127.0.0.1:3306)/csv_db 6")
-	if err != nil {
-		panic(err)
-	}
-
-	defer sql_database.Close()
-	fmt.Println("Подключение создано")
-
-	var stop []Stop
-
-	rows, err := sql_database.Query("SELECT _id, name FROM stopsker")
-	defer rows.Close()
-	if err != nil {
-		fmt.Println("Error in getting DB")
-		//log.Error("Problem", err)
-	} else {
-		var id int
-		var name string
-
-		for rows.Next() {
-			rows.Scan(&id, &name)
-			stop = append(stop, Stop{id, name})
-		}
-	}
-
-	return stop
-}*/
 
 func main() {
+	flag.Parse()
 
-	http.HandleFunc("/", getid)
-	http.ListenAndServe(":85", nil)
+	config := apiserver.NewConfig()
+	_, err := toml.DecodeFile(configPath, config)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	s := apiserver.New(nil)
+	if err := s.Start(); err != nil {
+		log.Fatal(err)
+	}
 }
