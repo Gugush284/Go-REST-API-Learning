@@ -1,6 +1,8 @@
 package store
 
-import models "github.com/Gugush284/Go-server.git/internal/app/model/user"
+import (
+	model_user "github.com/Gugush284/Go-server.git/internal/app/model/user"
+)
 
 // UserRepository ...
 type UserRepository struct {
@@ -8,7 +10,7 @@ type UserRepository struct {
 }
 
 // Create ...
-func (r *UserRepository) Create(u *models.User) (*models.User, error) {
+func (r *UserRepository) Create(login string, password string) (*model_user.User, error) {
 	if err := r.store.Open(); err != nil {
 		return nil, err
 	}
@@ -18,7 +20,7 @@ func (r *UserRepository) Create(u *models.User) (*models.User, error) {
 		return nil, err
 	}
 	defer statement.Close()
-	statement.Exec(u.GetLogin(), u.GetPassword())
+	statement.Exec(login, password)
 
 	rows, err := r.store.db.Query("SELECT LAST_INSERT_ID()")
 	if err != nil {
@@ -28,7 +30,9 @@ func (r *UserRepository) Create(u *models.User) (*models.User, error) {
 
 	var id int
 	rows.Scan(&id)
-	u.Add_id(id)
+
+	u := model_user.New()
+	u.Add_User(id, login, password)
 
 	return u, nil
 }

@@ -6,3 +6,7 @@ type User struct {
 	login    string
 	password string
 }
+
+func New() *User {
+	return &User{}
+}
