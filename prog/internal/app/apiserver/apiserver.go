@@ -22,7 +22,7 @@ func (s *APIserver) CreateTables() error {
 	}
 
 	db := s.store.Return_connection()
-	statement, err := db.Prepare("CREATE TABLE IF NOT EXISTS users (id INTEGER NOT NULL PRIMARY KEY, login VARCHAR(30) NOT NULL UNIQUE, password VARCHAR(30) NOT NULL)")
+	statement, err := db.Prepare("CREATE TABLE IF NOT EXISTS users (id INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT, login VARCHAR(30) NOT NULL UNIQUE, password VARCHAR(30) NOT NULL)")
 	if err != nil {
 		return err
 	}
