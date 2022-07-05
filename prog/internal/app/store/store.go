@@ -8,8 +8,9 @@ import (
 
 // Store for clients ...
 type Store struct {
-	config *Config
-	db     *sql.DB
+	config         *Config
+	db             *sql.DB
+	userRepository *UserRepository
 }
 
 // New Store ...
@@ -33,6 +34,23 @@ func (s *Store) Open() error {
 	s.db = db
 
 	return nil
+}
+
+func (s *Store) Return_connection() *sql.DB {
+	return s.db
+}
+
+// Access for User
+func (s *Store) User() *UserRepository {
+	if s.userRepository != nil {
+		return &UserRepository{}
+	}
+
+	s.userRepository = &UserRepository{
+		store: s,
+	}
+
+	return s.userRepository
 }
 
 // Close connection ...

@@ -16,6 +16,24 @@ type APIserver struct {
 	store  *store.Store
 }
 
+func (s *APIserver) CreateTables() error {
+	if err := s.store.Open(); err != nil {
+		return err
+	}
+
+	db := s.store.Return_connection()
+	statement, err := db.Prepare("CREATE TABLE IF NOT EXISTS users (id INTEGER NOT NULL PRIMARY KEY, login VARCHAR(30) NOT NULL UNIQUE, password VARCHAR(30) NOT NULL)")
+	if err != nil {
+		return err
+	}
+	statement.Exec()
+	defer statement.Close()
+
+	db.Close()
+
+	return nil
+}
+
 // Set log level ...
 func (s *APIserver) configureLogger() error {
 	level, err := logrus.ParseLevel(s.config.LogLevel)
@@ -62,6 +80,10 @@ func (s *APIserver) Start() error {
 	s.configureRouter()
 
 	if err := s.configureStore(); err != nil {
+		return err
+	}
+
+	if err := s.CreateTables(); err != nil {
 		return err
 	}
 
