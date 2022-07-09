@@ -18,18 +18,24 @@ func (r *UserRepository) Create(u *model_user.User) (*model_user.User, error) {
 		}
 	}
 
-	statement, err := r.store.db.Prepare("INSERT INTO users (login, password) VALUES (?, ?)")
+	if err := u.PreparationCreate(); err != nil {
+		return nil, err
+	}
+
+	statement, err := r.store.db.Exec("INSERT INTO users (login, password) VALUES (?, ?)", u.Login, u.Password)
 	if err != nil {
 		return nil, err
 	}
-	defer statement.Close()
-	statement.Exec(u.Login, u.Password)
 
-	row := r.store.db.QueryRow("SELECT LAST_INSERT_ID()")
-
-	if err := row.Scan(&u.ID); err != nil {
+	id, err := statement.LastInsertId()
+	if err != nil {
 		return nil, err
 	}
+	if id == 0 {
+		return nil, nil
+	}
+
+	u.ID = int(id)
 
 	return u, nil
 }

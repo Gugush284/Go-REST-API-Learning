@@ -20,6 +20,14 @@ func TestStore(t *testing.T, DbURL string) (*store.Store, func(...string)) {
 		t.Fatal(err)
 	}
 
+	db := s.Return_connection()
+	statement, err := db.Prepare("CREATE TABLE IF NOT EXISTS users (id INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT, login VARCHAR(30) NOT NULL UNIQUE, password TEXT NOT NULL)")
+	if err != nil {
+		t.Fatal(err)
+	}
+	statement.Exec()
+	defer statement.Close()
+
 	return s, func(tables ...string) {
 		if len(tables) > 0 {
 			db := s.Return_connection()

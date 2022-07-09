@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	tests_model "github.com/Gugush284/Go-server.git/internal/app/model/tests"
 	model_user "github.com/Gugush284/Go-server.git/internal/app/model/user"
 	"github.com/stretchr/testify/assert"
 )
@@ -12,10 +13,10 @@ func TestUserRepository_Create(t *testing.T) {
 	s, teardown := TestStore(t, dbURL)
 	defer teardown("users")
 
-	u := model_user.New()
-	u.Login = "Examale.org"
-	u.Password = "6565"
-	u, err := s.User().Create(u)
+	u, err := s.User().Create(tests_model.TestUser(t))
+	if u != nil {
+		fmt.Println(u.ID, u.Login, u.DecryptedPassword, u.Password)
+	}
 
 	assert.NoError(t, err)
 	assert.NotNil(t, u)
@@ -25,25 +26,31 @@ func TestUserRepository_Find(t *testing.T) {
 	s, teardown := TestStore(t, dbURL)
 	defer teardown("users")
 
-	login := "username@example.ex"
+	user := tests_model.TestUser(t)
+	if user != nil {
+		fmt.Println("1", user.ID, user.Login, user.DecryptedPassword, user.Password)
+	}
 
-	u, err := s.User().FindByLogin(login)
+	u, err := s.User().FindByLogin(user.Login)
 	if u != nil {
-		fmt.Println(u.ID, u.Login, u.Password)
+		fmt.Println("2", u.ID, u.Login, u.DecryptedPassword, u.Password)
 	}
 	assert.Error(t, err)
 	assert.Nil(t, u)
 
 	u, err = s.User().Create(&model_user.User{
-		Login:    login,
-		Password: "1234",
+		Login:             user.Login,
+		DecryptedPassword: user.DecryptedPassword,
 	})
+	if u != nil {
+		fmt.Println("3", u.ID, u.Login, u.DecryptedPassword, u.Password)
+	}
 	assert.NoError(t, err)
 	assert.NotNil(t, u)
 
-	username, err := s.User().FindByLogin(login)
-	if u != nil {
-		fmt.Println(u.ID, u.Login, u.Password)
+	username, err := s.User().FindByLogin(user.Login)
+	if username != nil {
+		fmt.Println("4", username.ID, username.Login, username.DecryptedPassword, username.Password)
 	}
 	assert.NoError(t, err)
 	assert.NotNil(t, username)
