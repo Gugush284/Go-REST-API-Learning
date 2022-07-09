@@ -43,7 +43,7 @@ func (s *Store) Return_connection() *sql.DB {
 // Access for User
 func (s *Store) User() *UserRepository {
 	if s.userRepository != nil {
-		return &UserRepository{}
+		return s.userRepository
 	}
 
 	s.userRepository = &UserRepository{

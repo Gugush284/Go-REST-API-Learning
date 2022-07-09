@@ -11,6 +11,7 @@ type UserRepository struct {
 
 // Create ...
 func (r *UserRepository) Create(u *model_user.User) (*model_user.User, error) {
+
 	if err := r.store.db.Ping(); err != nil {
 		if err := r.store.Open(); err != nil {
 			return nil, err
@@ -24,36 +25,32 @@ func (r *UserRepository) Create(u *model_user.User) (*model_user.User, error) {
 	defer statement.Close()
 	statement.Exec(u.Login, u.Password)
 
-	rows, err := r.store.db.Query("SELECT LAST_INSERT_ID()")
-	if err != nil {
+	row := r.store.db.QueryRow("SELECT LAST_INSERT_ID()")
+
+	if err := row.Scan(&u.ID); err != nil {
 		return nil, err
 	}
-	defer rows.Close()
-	rows.Scan(&u.ID)
 
 	return u, nil
 }
 
 // Find by login
 func (r *UserRepository) FindByLogin(login string) (*model_user.User, error) {
-	u := model_user.New()
-
 	if err := r.store.db.Ping(); err != nil {
 		if err := r.store.Open(); err != nil {
 			return nil, err
 		}
 	}
 
-	rows, err := r.store.db.Query(
+	u := model_user.New()
+	u.Login = login
+
+	row := r.store.db.QueryRow(
 		"SELECT id, password FROM users WHERE login = (?)",
 		login)
-	if err != nil {
+	if err := row.Scan(&u.ID, &u.Password); err != nil {
 		return nil, err
 	}
-	defer rows.Close()
-
-	rows.Scan(&u.ID, &u.Password)
-	u.Login = login
 
 	return u, nil
 }
