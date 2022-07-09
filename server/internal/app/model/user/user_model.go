@@ -34,5 +34,5 @@ func encryptString(str string) (string, error) {
 		return "", err
 	}
 
-	return string(b), err
+	return string(b), nil
 }
