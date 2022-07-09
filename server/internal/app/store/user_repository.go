@@ -11,6 +11,9 @@ type UserRepository struct {
 
 // Create ...
 func (r *UserRepository) Create(u *model_user.User) (*model_user.User, error) {
+	if err := u.Validate(); err != nil {
+		return nil, err
+	}
 
 	if err := r.store.db.Ping(); err != nil {
 		if err := r.store.Open(); err != nil {
