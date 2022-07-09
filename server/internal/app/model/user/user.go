@@ -45,6 +45,6 @@ func (u *User) Validate() error {
 	return validation.ValidateStruct(
 		u,
 		validation.Field(&u.Login, validation.Required, validation.Length(4, 25)),
-		validation.Field(&u.DecryptedPassword, validation.Required, validation.Length(8, 100)),
+		validation.Field(&u.DecryptedPassword, validation.By(requiredIf(u.Password == "")), validation.Length(8, 100)),
 	)
 }

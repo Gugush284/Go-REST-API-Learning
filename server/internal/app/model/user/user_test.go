@@ -1,9 +1,8 @@
-package tests_model
+package model_user
 
 import (
 	"testing"
 
-	model_user "github.com/Gugush284/Go-server.git/internal/app/model/user"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -16,19 +15,19 @@ func TestUser_PreparationCreate(t *testing.T) {
 func TestUser_Validate(t *testing.T) {
 	testCases := []struct {
 		name    string
-		u       func() *model_user.User
+		u       func() *User
 		isValid bool
 	}{
 		{
 			name: "valid",
-			u: func() *model_user.User {
+			u: func() *User {
 				return TestUser(t)
 			},
 			isValid: true,
 		},
 		{
 			name: "empty login",
-			u: func() *model_user.User {
+			u: func() *User {
 				u := TestUser(t)
 				u.Login = ""
 				return u
@@ -37,7 +36,7 @@ func TestUser_Validate(t *testing.T) {
 		},
 		{
 			name: "not size login",
-			u: func() *model_user.User {
+			u: func() *User {
 				u := TestUser(t)
 				u.Login = "ww"
 				return u
@@ -46,7 +45,7 @@ func TestUser_Validate(t *testing.T) {
 		},
 		{
 			name: "empty password",
-			u: func() *model_user.User {
+			u: func() *User {
 				u := TestUser(t)
 				u.DecryptedPassword = ""
 				return u
@@ -55,12 +54,22 @@ func TestUser_Validate(t *testing.T) {
 		},
 		{
 			name: "short password",
-			u: func() *model_user.User {
+			u: func() *User {
 				u := TestUser(t)
 				u.DecryptedPassword = "no"
 				return u
 			},
 			isValid: false,
+		},
+		{
+			name: "with encrypted password",
+			u: func() *User {
+				u := TestUser(t)
+				u.DecryptedPassword = ""
+				u.Password = "%asdw%5656"
+				return u
+			},
+			isValid: true,
 		},
 	}
 
