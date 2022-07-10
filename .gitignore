@@ -2,3 +2,4 @@ server/apiserver.exe
 server/.vscode
 .vscode
 server/client.exe
+server/configs/SessionKey.toml
