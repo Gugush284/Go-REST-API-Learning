@@ -23,13 +23,13 @@ buildclient:
 
 
 .PHONY: runclient
-runserver:
+runclient:
 	./client.exe
 
 
 
 .PHONY: build_run_client
-build_run_server:
+build_run_client:
 	go build -v ./cmd/client
 	./client.exe
 
