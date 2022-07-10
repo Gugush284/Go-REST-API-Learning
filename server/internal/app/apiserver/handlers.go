@@ -8,6 +8,8 @@ import (
 	model_user "github.com/Gugush284/Go-server.git/internal/app/model/user"
 )
 
+const sessionName = "activesession"
+
 func (s *server) handleUsersCreate() http.HandlerFunc {
 	type request struct {
 		Login    string `json:"login"`
@@ -64,6 +66,21 @@ func (s *server) handleSessionsCreate() http.HandlerFunc {
 			return
 		}
 
+		session, err := s.sessionStore.Get(r, sessionName)
+		if err != nil {
+			s.Err(w, r, http.StatusInternalServerError, err)
+			s.logger.Info("Request rejected as ", err)
+			return
+		}
+
+		session.Values["user_id"] = u.ID
+		if err := s.sessionStore.Save(r, w, session); err != nil {
+			s.Err(w, r, http.StatusInternalServerError, err)
+			s.logger.Info("Request rejected as ", err)
+			return
+		}
+
+		s.logger.Info("Create an active session for ", u.ID)
 		s.respond(w, r, http.StatusOK, nil)
 	}
 }

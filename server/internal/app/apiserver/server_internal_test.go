@@ -9,12 +9,13 @@ import (
 
 	model_user "github.com/Gugush284/Go-server.git/internal/app/model/user"
 	"github.com/Gugush284/Go-server.git/internal/app/store/teststore"
+	"github.com/gorilla/sessions"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestServer_HandleUserCreate(t *testing.T) {
-	s := newServer(teststore.New())
+	s := newServer(teststore.New(), sessions.NewCookieStore([]byte("secret")))
 	s.logger.SetLevel(logrus.ErrorLevel)
 
 	testcases := []struct {
@@ -66,7 +67,7 @@ func TestServer_HandleSessionCreate(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, u)
 
-	s := newServer(store)
+	s := newServer(store, sessions.NewCookieStore([]byte("se")))
 	s.logger.SetLevel(logrus.ErrorLevel)
 
 	testcases := []struct {

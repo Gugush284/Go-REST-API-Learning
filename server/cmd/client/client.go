@@ -64,6 +64,7 @@ func SessionRequest() {
 
 	log.Println(result)
 	log.Println(result["data"])
+	log.Println(resp.Cookies())
 }
 
 func CreateRequest() {
@@ -89,4 +90,5 @@ func CreateRequest() {
 
 	log.Println(result)
 	log.Println(result["data"])
+	log.Println(resp.Cookies())
 }

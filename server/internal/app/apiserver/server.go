@@ -5,20 +5,23 @@ import (
 
 	"github.com/Gugush284/Go-server.git/internal/app/store"
 	"github.com/gorilla/mux"
+	"github.com/gorilla/sessions"
 	"github.com/sirupsen/logrus"
 )
 
 type server struct {
-	router *mux.Router
-	logger *logrus.Logger
-	store  store.Store
+	router       *mux.Router
+	logger       *logrus.Logger
+	store        store.Store
+	sessionStore sessions.Store
 }
 
-func newServer(store store.Store) *server {
+func newServer(store store.Store, sessionStore sessions.Store) *server {
 	s := &server{
-		router: mux.NewRouter(),
-		logger: logrus.New(),
-		store:  store,
+		router:       mux.NewRouter(),
+		logger:       logrus.New(),
+		store:        store,
+		sessionStore: sessionStore,
 	}
 
 	s.configureRouter()
