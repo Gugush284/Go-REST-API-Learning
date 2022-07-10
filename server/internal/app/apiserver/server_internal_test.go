@@ -15,5 +15,6 @@ func TestServer_HandleUserCreate(t *testing.T) {
 	s := newServer(teststore.New())
 
 	s.ServeHTTP(rec, req)
+	println(rec.Code)
 	assert.Equal(t, rec.Code, http.StatusOK)
 }

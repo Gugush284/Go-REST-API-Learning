@@ -7,10 +7,10 @@ import (
 
 // User struct ...
 type User struct {
-	ID                int
-	Login             string
-	Password          string
-	DecryptedPassword string
+	ID                int    `json:"id"`
+	Login             string `json:"login"`
+	Password          string `json:"-"`
+	DecryptedPassword string `json:"password,omitempty"`
 }
 
 func New() *User {
@@ -47,4 +47,8 @@ func (u *User) Validate() error {
 		validation.Field(&u.Login, validation.Required, validation.Length(4, 25)),
 		validation.Field(&u.DecryptedPassword, validation.By(requiredIf(u.Password == "")), validation.Length(8, 100)),
 	)
+}
+
+func (u *User) Sanitize() {
+	u.DecryptedPassword = ""
 }

@@ -32,7 +32,7 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // Configuration of router ...
 func (s *server) configureRouter() {
-	s.router.HandleFunc("/users", s.handleUserCreate()).Methods("POST")
+	s.router.HandleFunc("/users", s.handleUsersCreate()).Methods("POST")
 }
 
 func (s *server) configureLogger(config *Config) error {
