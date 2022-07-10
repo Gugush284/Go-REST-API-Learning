@@ -14,10 +14,12 @@ func (s *server) handleUsersCreate() http.HandlerFunc {
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
+		s.logger.Info("Request to create a user")
+
 		req := &request{}
 		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
 			s.Err(w, r, http.StatusBadRequest, err)
-			s.logger.Info(err)
+			s.logger.Info("Request rejected as ", err)
 			return
 		}
 
@@ -28,7 +30,7 @@ func (s *server) handleUsersCreate() http.HandlerFunc {
 		u, err := s.store.User().Create(u)
 		if err != nil {
 			s.Err(w, r, http.StatusUnprocessableEntity, err)
-			s.logger.Info(err)
+			s.logger.Info("Request rejected as ", err)
 			return
 		}
 
