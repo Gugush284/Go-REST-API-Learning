@@ -1,8 +1,8 @@
 package teststore
 
 import (
+	globalErrors "github.com/Gugush284/Go-server.git/internal/app"
 	model_user "github.com/Gugush284/Go-server.git/internal/app/model/user"
-	"github.com/Gugush284/Go-server.git/internal/app/store"
 )
 
 type UserRepository struct {
@@ -30,7 +30,7 @@ func (r *UserRepository) Create(u *model_user.User) (*model_user.User, error) {
 func (r *UserRepository) FindByLogin(login string) (*model_user.User, error) {
 	u, ok := r.users[login]
 	if !ok {
-		return nil, store.ErrRecordNotFound
+		return nil, globalErrors.ErrRecordNotFound
 	}
 
 	return u, nil

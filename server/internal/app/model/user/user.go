@@ -42,3 +42,7 @@ func encryptString(str string) (string, error) {
 func (u *User) Sanitize() {
 	u.DecryptedPassword = ""
 }
+
+func (u *User) ComparePassword(password string) bool {
+	return bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password)) == nil
+}

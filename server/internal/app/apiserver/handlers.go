@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	globalErrors "github.com/Gugush284/Go-server.git/internal/app"
 	model_user "github.com/Gugush284/Go-server.git/internal/app/model/user"
 )
 
@@ -37,6 +38,33 @@ func (s *server) handleUsersCreate() http.HandlerFunc {
 		u.Sanitize()
 		s.respond(w, r, http.StatusCreated, u)
 		s.logger.Info("Create user ", u.Login, " with id = ", u.ID)
+	}
+}
+
+func (s *server) handleSessionsCreate() http.HandlerFunc {
+	type request struct {
+		Login    string `json:"login"`
+		Password string `json:"password"`
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		s.logger.Info("Request to create a session")
+
+		req := &request{}
+		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
+			s.Err(w, r, http.StatusBadRequest, err)
+			s.logger.Info("Request rejected as ", err)
+			return
+		}
+
+		u, err := s.store.User().FindByLogin(req.Login)
+		if err != nil || !u.ComparePassword(req.Password) {
+			s.Err(w, r, http.StatusUnauthorized, globalErrors.ErrIncorrectLoginOrPassword)
+			s.logger.Info("Request rejected as ", err)
+			return
+		}
+
+		s.respond(w, r, http.StatusOK, nil)
 	}
 }
 
