@@ -5,9 +5,8 @@ import (
 	"net/http"
 )
 
-// handler for '/hello'
-func (s *APIserver) handleHello() http.HandlerFunc {
+func (s *server) handleUserCreate() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		io.WriteString(w, "Hello")
+		io.WriteString(w, "User")
 	}
 }

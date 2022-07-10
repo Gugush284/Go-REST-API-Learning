@@ -1,12 +1,15 @@
-package store
+package sqlstore
 
 import (
+	"database/sql"
+
 	model_user "github.com/Gugush284/Go-server.git/internal/app/model/user"
+	"github.com/Gugush284/Go-server.git/internal/app/store"
 )
 
 // UserRepository ...
 type UserRepository struct {
-	store *Store
+	store *SqlStore
 }
 
 // Create ...
@@ -15,7 +18,7 @@ func (r *UserRepository) Create(u *model_user.User) (*model_user.User, error) {
 		return nil, err
 	}
 
-	if err := r.store.db.Ping(); err != nil {
+	if err := r.store.Db.Ping(); err != nil {
 		if err := r.store.Open(); err != nil {
 			return nil, err
 		}
@@ -25,7 +28,7 @@ func (r *UserRepository) Create(u *model_user.User) (*model_user.User, error) {
 		return nil, err
 	}
 
-	statement, err := r.store.db.Exec("INSERT INTO users (login, password) VALUES (?, ?)", u.Login, u.Password)
+	statement, err := r.store.Db.Exec("INSERT INTO users (login, password) VALUES (?, ?)", u.Login, u.Password)
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +48,7 @@ func (r *UserRepository) Create(u *model_user.User) (*model_user.User, error) {
 
 // Find by login
 func (r *UserRepository) FindByLogin(login string) (*model_user.User, error) {
-	if err := r.store.db.Ping(); err != nil {
+	if err := r.store.Db.Ping(); err != nil {
 		if err := r.store.Open(); err != nil {
 			return nil, err
 		}
@@ -54,10 +57,14 @@ func (r *UserRepository) FindByLogin(login string) (*model_user.User, error) {
 	u := model_user.New()
 	u.Login = login
 
-	row := r.store.db.QueryRow(
+	row := r.store.Db.QueryRow(
 		"SELECT id, password FROM users WHERE login = (?)",
 		login)
 	if err := row.Scan(&u.ID, &u.Password); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, store.ErrRecordNotFound
+		}
+
 		return nil, err
 	}
 
