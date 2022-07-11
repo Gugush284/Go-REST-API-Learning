@@ -22,8 +22,9 @@ func (s *TestStore) User() store.UserRepository {
 	}
 
 	s.userRepository = &UserRepository{
-		store: s,
-		users: make(map[string]*model_user.User),
+		store:    s,
+		usersStr: make(map[string]*model_user.User),
+		usersID:  make(map[int]*model_user.User),
 	}
 
 	return s.userRepository

@@ -6,8 +6,9 @@ import (
 )
 
 type UserRepository struct {
-	store *TestStore
-	users map[string]*ModelUser.User
+	store    *TestStore
+	usersStr map[string]*ModelUser.User
+	usersID  map[int]*ModelUser.User
 }
 
 // Create ...
@@ -20,15 +21,26 @@ func (r *UserRepository) Create(u *ModelUser.User) (*ModelUser.User, error) {
 		return nil, err
 	}
 
-	r.users[u.Login] = u
-	u.ID = len(r.users)
+	r.usersStr[u.Login] = u
+	u.ID = len(r.usersStr)
+	r.usersID[u.ID] = u
 
 	return u, nil
 }
 
 // Find by login
 func (r *UserRepository) FindByLogin(login string) (*ModelUser.User, error) {
-	u, ok := r.users[login]
+	u, ok := r.usersStr[login]
+	if !ok {
+		return nil, globalErrors.ErrRecordNotFound
+	}
+
+	return u, nil
+}
+
+// Find by id
+func (r *UserRepository) Find(id int) (*ModelUser.User, error) {
+	u, ok := r.usersID[id]
 	if !ok {
 		return nil, globalErrors.ErrRecordNotFound
 	}
