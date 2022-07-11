@@ -3,7 +3,7 @@ package sqlstore
 import (
 	"database/sql"
 
-	globalErrors "github.com/Gugush284/Go-server.git/internal/apiserver"
+	Constants "github.com/Gugush284/Go-server.git/internal/apiserver"
 	model_user "github.com/Gugush284/Go-server.git/internal/apiserver/model/user"
 )
 
@@ -62,7 +62,7 @@ func (r *UserRepository) FindByLogin(login string) (*model_user.User, error) {
 		login)
 	if err := row.Scan(&u.ID, &u.Password); err != nil {
 		if err == sql.ErrNoRows {
-			return nil, globalErrors.ErrRecordNotFound
+			return nil, Constants.ErrRecordNotFound
 		}
 
 		return nil, err
@@ -87,7 +87,7 @@ func (r *UserRepository) Find(id int) (*model_user.User, error) {
 		id)
 	if err := row.Scan(&u.Login, &u.Password); err != nil {
 		if err == sql.ErrNoRows {
-			return nil, globalErrors.ErrRecordNotFound
+			return nil, Constants.ErrRecordNotFound
 		}
 
 		return nil, err

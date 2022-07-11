@@ -1,14 +1,13 @@
 package apiserver
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 
-	globalErrors "github.com/Gugush284/Go-server.git/internal/apiserver"
+	Constants "github.com/Gugush284/Go-server.git/internal/apiserver"
 	model_user "github.com/Gugush284/Go-server.git/internal/apiserver/model/user"
 )
-
-const sessionName = "activesession"
 
 func (s *server) handleUsersCreate() http.HandlerFunc {
 	type request struct {
@@ -61,12 +60,12 @@ func (s *server) handleSessionsCreate() http.HandlerFunc {
 
 		u, err := s.store.User().FindByLogin(req.Login)
 		if err != nil || !u.ComparePassword(req.Password) {
-			s.Err(w, r, http.StatusUnauthorized, globalErrors.ErrIncorrectLoginOrPassword)
+			s.Err(w, r, http.StatusUnauthorized, Constants.ErrIncorrectLoginOrPassword)
 			s.Logger.Info("Request rejected as ", err)
 			return
 		}
 
-		session, err := s.sessionStore.Get(r, sessionName)
+		session, err := s.sessionStore.Get(r, Constants.SessionName)
 		if err != nil {
 			s.Err(w, r, http.StatusInternalServerError, err)
 			s.Logger.Info("Request rejected as ", err)
@@ -76,7 +75,7 @@ func (s *server) handleSessionsCreate() http.HandlerFunc {
 		session.Values["user_id"] = u.ID
 		if err := s.sessionStore.Save(r, w, session); err != nil {
 			s.Err(w, r, http.StatusInternalServerError, err)
-			s.Logger.Info("Request rejected as ", err)
+			s.Logger.Error("Request rejected as ", err)
 			return
 		}
 
@@ -85,13 +84,29 @@ func (s *server) handleSessionsCreate() http.HandlerFunc {
 	}
 }
 
-func (s *server) Err(w http.ResponseWriter, r *http.Request, code int, err error) {
-	s.respond(w, r, code, map[string]string{"error": err.Error()})
-}
+func (s *server) authenticateUser(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		session, err := s.sessionStore.Get(r, Constants.SessionName)
+		if err != nil {
+			s.Err(w, r, http.StatusInternalServerError, err)
+			s.Logger.Error(err)
+			return
+		}
 
-func (s *server) respond(w http.ResponseWriter, r *http.Request, code int, data interface{}) {
-	w.WriteHeader(code)
-	if data != nil {
-		json.NewEncoder(w).Encode(data)
-	}
+		id, ok := session.Values["user_id"]
+		if !ok {
+			s.Err(w, r, http.StatusUnauthorized, Constants.ErrNotAuthenticated)
+			s.Logger.Error(Constants.ErrNotAuthenticated)
+			return
+		}
+
+		u, err := s.store.User().Find(id.(int))
+		if err != nil {
+			s.Err(w, r, http.StatusUnauthorized, Constants.ErrNotAuthenticated)
+			s.Logger.Error(Constants.ErrNotAuthenticated)
+			return
+		}
+
+		next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), Constants.CtxKeyUser, u)))
+	})
 }

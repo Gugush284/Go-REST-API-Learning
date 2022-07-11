@@ -1,7 +1,7 @@
 package teststore
 
 import (
-	globalErrors "github.com/Gugush284/Go-server.git/internal/apiserver"
+	Constants "github.com/Gugush284/Go-server.git/internal/apiserver"
 	ModelUser "github.com/Gugush284/Go-server.git/internal/apiserver/model/user"
 )
 
@@ -32,7 +32,7 @@ func (r *UserRepository) Create(u *ModelUser.User) (*ModelUser.User, error) {
 func (r *UserRepository) FindByLogin(login string) (*ModelUser.User, error) {
 	u, ok := r.usersStr[login]
 	if !ok {
-		return nil, globalErrors.ErrRecordNotFound
+		return nil, Constants.ErrRecordNotFound
 	}
 
 	return u, nil
@@ -42,7 +42,7 @@ func (r *UserRepository) FindByLogin(login string) (*ModelUser.User, error) {
 func (r *UserRepository) Find(id int) (*ModelUser.User, error) {
 	u, ok := r.usersID[id]
 	if !ok {
-		return nil, globalErrors.ErrRecordNotFound
+		return nil, Constants.ErrRecordNotFound
 	}
 
 	return u, nil
