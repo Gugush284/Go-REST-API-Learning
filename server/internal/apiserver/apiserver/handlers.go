@@ -84,7 +84,7 @@ func (s *server) handleSessionsCreate() http.HandlerFunc {
 	}
 }
 
-func (s *server) authenticateUser(next http.Handler) http.Handler {
+func (s *server) AuthenticateUser(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		session, err := s.sessionStore.Get(r, Constants.SessionName)
 		if err != nil {
