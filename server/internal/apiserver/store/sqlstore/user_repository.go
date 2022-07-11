@@ -70,3 +70,28 @@ func (r *UserRepository) FindByLogin(login string) (*model_user.User, error) {
 
 	return u, nil
 }
+
+// Find by id
+func (r *UserRepository) Find(id int) (*model_user.User, error) {
+	if err := r.store.Db.Ping(); err != nil {
+		if err := r.store.Open(); err != nil {
+			return nil, err
+		}
+	}
+
+	u := model_user.New()
+	u.ID = id
+
+	row := r.store.Db.QueryRow(
+		"SELECT login, password FROM users WHERE id = (?)",
+		id)
+	if err := row.Scan(&u.Login, &u.Password); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, globalErrors.ErrRecordNotFound
+		}
+
+		return nil, err
+	}
+
+	return u, nil
+}
