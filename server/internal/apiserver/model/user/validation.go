@@ -1,4 +1,4 @@
-package model_user
+package ModelUser
 
 import validation "github.com/go-ozzo/ozzo-validation"
 

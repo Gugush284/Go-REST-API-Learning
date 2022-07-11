@@ -3,7 +3,8 @@ package test_sqlstore
 import (
 	"testing"
 
-	model_user "github.com/Gugush284/Go-server.git/internal/app/model/user"
+	model_user "github.com/Gugush284/Go-server.git/internal/apiserver/model/user"
+	ModelUserTest "github.com/Gugush284/Go-server.git/internal/apiserver/tests/model/users"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -11,7 +12,7 @@ func TestUserRepository_Create(t *testing.T) {
 	s, teardown := TestStore(t, dbURL)
 	defer teardown("users")
 
-	u, err := s.User().Create(model_user.TestUser(t))
+	u, err := s.User().Create(ModelUserTest.TestUser(t))
 	/*if u != nil {
 		fmt.Println(u.ID, u.Login, u.DecryptedPassword, u.Password)
 	}*/
@@ -24,7 +25,7 @@ func TestUserRepository_Find(t *testing.T) {
 	s, teardown := TestStore(t, dbURL)
 	defer teardown("users")
 
-	user := model_user.TestUser(t)
+	user := ModelUserTest.TestUser(t)
 	/*if user != nil {
 		fmt.Println("1", user.ID, user.Login, user.DecryptedPassword, user.Password)
 	}*/

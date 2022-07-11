@@ -5,7 +5,7 @@ import (
 	"log"
 
 	"github.com/BurntSushi/toml"
-	"github.com/Gugush284/Go-server.git/internal/app/apiserver"
+	"github.com/Gugush284/Go-server.git/internal/apiserver/apiserver"
 )
 
 var configPath string

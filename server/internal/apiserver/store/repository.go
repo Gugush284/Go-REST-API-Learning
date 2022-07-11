@@ -1,6 +1,6 @@
 package store
 
-import model_user "github.com/Gugush284/Go-server.git/internal/app/model/user"
+import model_user "github.com/Gugush284/Go-server.git/internal/apiserver/model/user"
 
 type UserRepository interface {
 	Create(*model_user.User) (*model_user.User, error)

@@ -1,8 +1,8 @@
 package teststore
 
 import (
-	model_user "github.com/Gugush284/Go-server.git/internal/app/model/user"
-	"github.com/Gugush284/Go-server.git/internal/app/store"
+	model_user "github.com/Gugush284/Go-server.git/internal/apiserver/model/user"
+	"github.com/Gugush284/Go-server.git/internal/apiserver/store"
 )
 
 // Store for clients ...

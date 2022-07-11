@@ -3,8 +3,8 @@ package sqlstore
 import (
 	"database/sql"
 
-	globalErrors "github.com/Gugush284/Go-server.git/internal/app"
-	model_user "github.com/Gugush284/Go-server.git/internal/app/model/user"
+	globalErrors "github.com/Gugush284/Go-server.git/internal/apiserver"
+	model_user "github.com/Gugush284/Go-server.git/internal/apiserver/model/user"
 )
 
 // UserRepository ...

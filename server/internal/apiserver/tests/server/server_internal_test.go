@@ -1,4 +1,4 @@
-package apiserver
+package apiserver_test
 
 import (
 	"bytes"
@@ -7,16 +7,17 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	model_user "github.com/Gugush284/Go-server.git/internal/app/model/user"
-	"github.com/Gugush284/Go-server.git/internal/app/store/teststore"
+	"github.com/Gugush284/Go-server.git/internal/apiserver/apiserver"
+	"github.com/Gugush284/Go-server.git/internal/apiserver/store/teststore"
+	ModelUserTest "github.com/Gugush284/Go-server.git/internal/apiserver/tests/model/users"
 	"github.com/gorilla/sessions"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestServer_HandleUserCreate(t *testing.T) {
-	s := newServer(teststore.New(), sessions.NewCookieStore([]byte("secret")))
-	s.logger.SetLevel(logrus.ErrorLevel)
+	s := apiserver.NewServer(teststore.New(), sessions.NewCookieStore([]byte("secret")))
+	s.Logger.SetLevel(logrus.ErrorLevel)
 
 	testcases := []struct {
 		name         string
@@ -60,15 +61,15 @@ func TestServer_HandleUserCreate(t *testing.T) {
 }
 
 func TestServer_HandleSessionCreate(t *testing.T) {
-	u := model_user.TestUser(t)
+	u := ModelUserTest.TestUser(t)
 
 	store := teststore.New()
 	u, err := store.User().Create(u)
 	assert.NoError(t, err)
 	assert.NotNil(t, u)
 
-	s := newServer(store, sessions.NewCookieStore([]byte("se")))
-	s.logger.SetLevel(logrus.ErrorLevel)
+	s := apiserver.NewServer(store, sessions.NewCookieStore([]byte("se")))
+	s.Logger.SetLevel(logrus.ErrorLevel)
 
 	testcases := []struct {
 		name         string

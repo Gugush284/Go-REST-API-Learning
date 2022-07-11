@@ -3,7 +3,7 @@ package apiserver
 import (
 	"net/http"
 
-	"github.com/Gugush284/Go-server.git/internal/app/store/sqlstore"
+	"github.com/Gugush284/Go-server.git/internal/apiserver/store/sqlstore"
 	"github.com/gorilla/sessions"
 )
 
@@ -12,7 +12,7 @@ func Start(config *Config) error {
 
 	sessionStore := sessions.NewCookieStore([]byte(config.SessionKey))
 
-	srv := newServer(store, sessionStore)
+	srv := NewServer(store, sessionStore)
 
 	if err := srv.configureLogger(config); err != nil {
 		return err
@@ -22,8 +22,8 @@ func Start(config *Config) error {
 		return err
 	}
 
-	srv.logger.Info("starting api server")
-	srv.logger.Debug(config.SessionKey)
+	srv.Logger.Info("starting api server")
+	srv.Logger.Debug(config.SessionKey)
 	defer store.Db.Close()
 
 	return http.ListenAndServe(config.BindAddr, srv)

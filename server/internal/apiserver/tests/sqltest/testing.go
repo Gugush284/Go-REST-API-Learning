@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Gugush284/Go-server.git/internal/app/store/sqlstore"
+	"github.com/Gugush284/Go-server.git/internal/apiserver/store/sqlstore"
 )
 
 // TEST STORE ...

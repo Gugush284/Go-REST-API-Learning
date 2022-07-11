@@ -3,7 +3,7 @@ package sqlstore
 import (
 	"database/sql"
 
-	"github.com/Gugush284/Go-server.git/internal/app/store"
+	"github.com/Gugush284/Go-server.git/internal/apiserver/store"
 	_ "github.com/go-sql-driver/mysql" // sql driver ...
 )
 

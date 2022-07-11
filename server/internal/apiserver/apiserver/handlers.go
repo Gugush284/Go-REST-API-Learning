@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	globalErrors "github.com/Gugush284/Go-server.git/internal/app"
-	model_user "github.com/Gugush284/Go-server.git/internal/app/model/user"
+	globalErrors "github.com/Gugush284/Go-server.git/internal/apiserver"
+	model_user "github.com/Gugush284/Go-server.git/internal/apiserver/model/user"
 )
 
 const sessionName = "activesession"
@@ -17,12 +17,12 @@ func (s *server) handleUsersCreate() http.HandlerFunc {
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		s.logger.Info("Request to create a user")
+		s.Logger.Info("Request to create a user")
 
 		req := &request{}
 		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
 			s.Err(w, r, http.StatusBadRequest, err)
-			s.logger.Info("Request rejected as ", err)
+			s.Logger.Info("Request rejected as ", err)
 			return
 		}
 
@@ -33,13 +33,13 @@ func (s *server) handleUsersCreate() http.HandlerFunc {
 		u, err := s.store.User().Create(u)
 		if err != nil {
 			s.Err(w, r, http.StatusUnprocessableEntity, err)
-			s.logger.Info("Request rejected as ", err)
+			s.Logger.Info("Request rejected as ", err)
 			return
 		}
 
 		u.Sanitize()
 		s.respond(w, r, http.StatusCreated, u)
-		s.logger.Info("Create user ", u.Login, " with id = ", u.ID)
+		s.Logger.Info("Create user ", u.Login, " with id = ", u.ID)
 	}
 }
 
@@ -50,37 +50,37 @@ func (s *server) handleSessionsCreate() http.HandlerFunc {
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		s.logger.Info("Request to create a session")
+		s.Logger.Info("Request to create a session")
 
 		req := &request{}
 		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
 			s.Err(w, r, http.StatusBadRequest, err)
-			s.logger.Info("Request rejected as ", err)
+			s.Logger.Info("Request rejected as ", err)
 			return
 		}
 
 		u, err := s.store.User().FindByLogin(req.Login)
 		if err != nil || !u.ComparePassword(req.Password) {
 			s.Err(w, r, http.StatusUnauthorized, globalErrors.ErrIncorrectLoginOrPassword)
-			s.logger.Info("Request rejected as ", err)
+			s.Logger.Info("Request rejected as ", err)
 			return
 		}
 
 		session, err := s.sessionStore.Get(r, sessionName)
 		if err != nil {
 			s.Err(w, r, http.StatusInternalServerError, err)
-			s.logger.Info("Request rejected as ", err)
+			s.Logger.Info("Request rejected as ", err)
 			return
 		}
 
 		session.Values["user_id"] = u.ID
 		if err := s.sessionStore.Save(r, w, session); err != nil {
 			s.Err(w, r, http.StatusInternalServerError, err)
-			s.logger.Info("Request rejected as ", err)
+			s.Logger.Info("Request rejected as ", err)
 			return
 		}
 
-		s.logger.Info("Create an active session for ", u.ID)
+		s.Logger.Info("Create an active session for ", u.ID)
 		s.respond(w, r, http.StatusOK, nil)
 	}
 }

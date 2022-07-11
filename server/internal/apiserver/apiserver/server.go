@@ -3,7 +3,7 @@ package apiserver
 import (
 	"net/http"
 
-	"github.com/Gugush284/Go-server.git/internal/app/store"
+	"github.com/Gugush284/Go-server.git/internal/apiserver/store"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	"github.com/sirupsen/logrus"
@@ -11,15 +11,15 @@ import (
 
 type server struct {
 	router       *mux.Router
-	logger       *logrus.Logger
+	Logger       *logrus.Logger
 	store        store.Store
 	sessionStore sessions.Store
 }
 
-func newServer(store store.Store, sessionStore sessions.Store) *server {
+func NewServer(store store.Store, sessionStore sessions.Store) *server {
 	s := &server{
 		router:       mux.NewRouter(),
-		logger:       logrus.New(),
+		Logger:       logrus.New(),
 		store:        store,
 		sessionStore: sessionStore,
 	}
@@ -45,7 +45,7 @@ func (s *server) configureLogger(config *Config) error {
 		return err
 	}
 
-	s.logger.SetLevel(level)
+	s.Logger.SetLevel(level)
 
 	return nil
 }
