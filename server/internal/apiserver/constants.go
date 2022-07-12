@@ -12,7 +12,9 @@ var (
 	ErrNotAuthenticated         = errors.New("not authenticated")
 )
 
+const SessionName = "activesession"
+
 const (
-	SessionName        = "activesession"
-	CtxKeyUser  ctxKey = iota
+	CtxKeyUser ctxKey = iota
+	CtxKeyId
 )

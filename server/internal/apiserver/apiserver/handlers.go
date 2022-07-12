@@ -7,6 +7,7 @@ import (
 
 	Constants "github.com/Gugush284/Go-server.git/internal/apiserver"
 	ModelUser "github.com/Gugush284/Go-server.git/internal/apiserver/model/user"
+	"github.com/google/uuid"
 )
 
 func (s *server) handleUsersCreate() http.HandlerFunc {
@@ -114,5 +115,13 @@ func (s *server) AuthenticateUser(next http.Handler) http.Handler {
 func (s *server) handleWhoami() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		s.respond(w, r, http.StatusOK, r.Context().Value(Constants.CtxKeyUser).(*ModelUser.User))
+	})
+}
+
+func (s *server) SetRequestID(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		uuID := uuid.New().String()
+		w.Header().Set("X-Request-ID", uuID)
+		next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), Constants.CtxKeyId, uuID)))
 	})
 }

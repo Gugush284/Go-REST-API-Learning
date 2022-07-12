@@ -35,7 +35,7 @@ func SessionRequest() []*http.Cookie {
 	json.NewDecoder(resp.Body).Decode(&result)
 
 	log.Println(result)
-	log.Println(result["data"])
+	log.Println(resp.Header.Get("X-Request-ID"))
 
 	cookie := resp.Cookies()
 	log.Println(cookie)
@@ -68,7 +68,7 @@ func CreateRequest() {
 	json.NewDecoder(resp.Body).Decode(&result)
 
 	log.Println(result)
-	log.Println(result["data"])
+	log.Println(resp.Header.Get("X-Request-ID"))
 }
 
 func WhoamiRequest(cookie []*http.Cookie) {
@@ -106,4 +106,5 @@ func WhoamiRequest(cookie []*http.Cookie) {
 	defer resp.Body.Close()
 
 	log.Println(string(body))
+	log.Println(resp.Header.Get("X-Request-ID"))
 }
