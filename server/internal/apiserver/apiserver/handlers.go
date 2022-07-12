@@ -4,10 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"time"
 
 	Constants "github.com/Gugush284/Go-server.git/internal/apiserver"
 	ModelUser "github.com/Gugush284/Go-server.git/internal/apiserver/model/user"
 	"github.com/google/uuid"
+	"github.com/sirupsen/logrus"
 )
 
 func (s *server) handleUsersCreate() http.HandlerFunc {
@@ -17,12 +19,10 @@ func (s *server) handleUsersCreate() http.HandlerFunc {
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		s.Logger.Info("Request to create a user")
 
 		req := &request{}
 		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
 			s.Err(w, r, http.StatusBadRequest, err)
-			s.Logger.Info("Request rejected as ", err)
 			return
 		}
 
@@ -33,7 +33,6 @@ func (s *server) handleUsersCreate() http.HandlerFunc {
 		u, err := s.store.User().Create(u)
 		if err != nil {
 			s.Err(w, r, http.StatusUnprocessableEntity, err)
-			s.Logger.Info("Request rejected as ", err)
 			return
 		}
 
@@ -50,33 +49,28 @@ func (s *server) handleSessionsCreate() http.HandlerFunc {
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		s.Logger.Info("Request to create a session")
 
 		req := &request{}
 		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
 			s.Err(w, r, http.StatusBadRequest, err)
-			s.Logger.Info("Request rejected as ", err)
 			return
 		}
 
 		u, err := s.store.User().FindByLogin(req.Login)
 		if err != nil || !u.ComparePassword(req.Password) {
 			s.Err(w, r, http.StatusUnauthorized, Constants.ErrIncorrectLoginOrPassword)
-			s.Logger.Info("Request rejected as ", err)
 			return
 		}
 
 		session, err := s.sessionStore.Get(r, Constants.SessionName)
 		if err != nil {
 			s.Err(w, r, http.StatusInternalServerError, err)
-			s.Logger.Info("Request rejected as ", err)
 			return
 		}
 
 		session.Values["user_id"] = u.ID
 		if err := s.sessionStore.Save(r, w, session); err != nil {
 			s.Err(w, r, http.StatusInternalServerError, err)
-			s.Logger.Error("Request rejected as ", err)
 			return
 		}
 
@@ -97,14 +91,12 @@ func (s *server) AuthenticateUser(next http.Handler) http.Handler {
 		id, ok := session.Values["user_id"]
 		if !ok {
 			s.Err(w, r, http.StatusUnauthorized, Constants.ErrNotAuthenticated)
-			s.Logger.Error(Constants.ErrNotAuthenticated)
 			return
 		}
 
 		u, err := s.store.User().Find(id.(int))
 		if err != nil {
 			s.Err(w, r, http.StatusUnauthorized, Constants.ErrNotAuthenticated)
-			s.Logger.Error(Constants.ErrNotAuthenticated)
 			return
 		}
 
@@ -118,10 +110,25 @@ func (s *server) handleWhoami() http.HandlerFunc {
 	})
 }
 
-func (s *server) SetRequestID(next http.Handler) http.Handler {
+func (s *server) setRequestID(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		uuID := uuid.New().String()
 		w.Header().Set("X-Request-ID", uuID)
 		next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), Constants.CtxKeyId, uuID)))
+	})
+}
+
+func (s *server) logRequest(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		logger := s.Logger.WithFields(logrus.Fields{
+			"remote_addr": r.RemoteAddr,
+			"request_id":  r.Context().Value(Constants.CtxKeyId),
+		})
+		logger.Infof("started %s, %s", r.Method, r.RequestURI)
+
+		start := time.Now()
+		next.ServeHTTP(w, r)
+
+		logger.Infof("completed in %v", time.Since(start))
 	})
 }
