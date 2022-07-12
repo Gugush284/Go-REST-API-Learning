@@ -37,6 +37,10 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (s *server) configureRouter() {
 	s.router.HandleFunc("/users", s.handleUsersCreate()).Methods("POST")
 	s.router.HandleFunc("/sessions", s.handleSessionsCreate()).Methods("POST")
+
+	private := s.router.PathPrefix("/private").Subrouter()
+	private.Use(s.AuthenticateUser)
+	private.HandleFunc("/whoami", s.handleWhoami()).Methods("GET")
 }
 
 func (s *server) configureLogger(config *Config) error {

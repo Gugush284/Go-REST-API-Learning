@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	Constants "github.com/Gugush284/Go-server.git/internal/apiserver"
-	model_user "github.com/Gugush284/Go-server.git/internal/apiserver/model/user"
+	ModelUser "github.com/Gugush284/Go-server.git/internal/apiserver/model/user"
 )
 
 func (s *server) handleUsersCreate() http.HandlerFunc {
@@ -25,7 +25,7 @@ func (s *server) handleUsersCreate() http.HandlerFunc {
 			return
 		}
 
-		u := &model_user.User{
+		u := &ModelUser.User{
 			Login:             req.Login,
 			DecryptedPassword: req.Password,
 		}
@@ -108,5 +108,11 @@ func (s *server) AuthenticateUser(next http.Handler) http.Handler {
 		}
 
 		next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), Constants.CtxKeyUser, u)))
+	})
+}
+
+func (s *server) handleWhoami() http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		s.respond(w, r, http.StatusOK, r.Context().Value(Constants.CtxKeyUser).(*ModelUser.User))
 	})
 }
