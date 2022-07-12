@@ -1,47 +1,16 @@
-package main
+package ServerClient
 
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
+	"net/http/cookiejar"
+	"net/url"
 )
 
-func main() {
-	Menu()
-
-	for {
-		var key int
-
-		fmt.Fprint(os.Stdout, "Choose func\n")
-		fmt.Fscan(os.Stdin, &key)
-
-		switch key {
-		case 0:
-			os.Exit(0)
-		case 1:
-			CreateRequest()
-		case 2:
-			SessionRequest()
-		case 3:
-			Menu()
-		default:
-			fmt.Fprint(os.Stdout, "Unknown case\n")
-		}
-	}
-}
-
-func Menu() {
-	fmt.Fprint(os.Stdout, "Menu:\n")
-	fmt.Fprint(os.Stdout, " case 0: Exit\n")
-	fmt.Fprint(os.Stdout, " case 1: CreateRequest\n")
-	fmt.Fprint(os.Stdout, " case 2: SessionRequest\n")
-	fmt.Fprint(os.Stdout, " case 3: Menu\n")
-}
-
-func SessionRequest() {
+func SessionRequest() []*http.Cookie {
 
 	message := map[string]interface{}{
 		"login":    "Slava8924",
@@ -51,12 +20,15 @@ func SessionRequest() {
 	bytesRepresentation, err := json.Marshal(message)
 	if err != nil {
 		log.Fatalln(err)
+		return nil
 	}
 
 	resp, err := http.Post("http://localhost:8080/sessions", "application/json", bytes.NewBuffer(bytesRepresentation))
 	if err != nil {
 		log.Fatalln(err)
+		return nil
 	}
+	defer resp.Body.Close()
 
 	var result map[string]interface{}
 
@@ -64,7 +36,11 @@ func SessionRequest() {
 
 	log.Println(result)
 	log.Println(result["data"])
-	log.Println(resp.Cookies())
+
+	cookie := resp.Cookies()
+	log.Println(cookie)
+
+	return cookie
 }
 
 func CreateRequest() {
@@ -77,12 +53,15 @@ func CreateRequest() {
 	bytesRepresentation, err := json.Marshal(message)
 	if err != nil {
 		log.Fatalln(err)
+		return
 	}
 
 	resp, err := http.Post("http://localhost:8080/users", "application/json", bytes.NewBuffer(bytesRepresentation))
 	if err != nil {
 		log.Fatalln(err)
+		return
 	}
+	defer resp.Body.Close()
 
 	var result map[string]interface{}
 
@@ -90,5 +69,41 @@ func CreateRequest() {
 
 	log.Println(result)
 	log.Println(result["data"])
-	log.Println(resp.Cookies())
+}
+
+func WhoamiRequest(cookie []*http.Cookie) {
+	req, err := http.NewRequest("GET", "http://localhost:8080/private/whoami", nil)
+	if err != nil {
+		log.Fatalf("Got error %s", err.Error())
+		return
+	}
+
+	jar, err := cookiejar.New(nil)
+	if err != nil {
+		log.Fatalf("Got error while creating cookie jar %s", err.Error())
+		return
+	}
+
+	client := http.Client{
+		Jar: jar,
+	}
+
+	urlObj, _ := url.Parse("http://localhost:8080/private/whoami")
+
+	client.Jar.SetCookies(urlObj, cookie)
+
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatalln(err)
+		return
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatalln(err)
+		return
+	}
+	defer resp.Body.Close()
+
+	log.Println(string(body))
 }
