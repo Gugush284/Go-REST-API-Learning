@@ -137,3 +137,9 @@ func (s *server) logRequest(next http.Handler) http.Handler {
 			time.Since(start))
 	})
 }
+
+/*func (s *server) UploadImage() http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		s.respond(w, r, http.StatusOK, r.Context().Value(Constants.CtxKeyUser).(*ModelUser.User))
+	})
+}*/

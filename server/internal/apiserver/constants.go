@@ -10,6 +10,7 @@ var (
 	ErrRecordNotFound           = errors.New("record not found")
 	ErrIncorrectLoginOrPassword = errors.New("incorrect login or password")
 	ErrNotAuthenticated         = errors.New("not authenticated")
+	ErrSqlIdNil                 = errors.New("sql return id = 0")
 )
 
 const SessionName = "activesession"

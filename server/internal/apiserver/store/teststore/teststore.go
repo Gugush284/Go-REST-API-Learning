@@ -7,7 +7,8 @@ import (
 
 // Store for clients ...
 type TestStore struct {
-	userRepository *UserRepository
+	userRepository  *UserRepository
+	imageRepository *ImageRepository
 }
 
 // New Store ...
@@ -28,4 +29,17 @@ func (s *TestStore) User() store.UserRepository {
 	}
 
 	return s.userRepository
+}
+
+// Access for Image
+func (s *TestStore) Image() store.ImageRepository {
+	if s.imageRepository != nil {
+		return s.imageRepository
+	}
+
+	s.imageRepository = &ImageRepository{
+		store: s,
+	}
+
+	return s.imageRepository
 }
