@@ -4,8 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -184,5 +186,35 @@ func (s *server) UploadImage() http.HandlerFunc {
 		}
 
 		s.respond(w, r, http.StatusCreated, i)
+	})
+}
+
+func (s *server) Download() http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		key := strings.ReplaceAll(r.URL.Path, "/download/", "")
+
+		id, err := strconv.Atoi(key)
+		if err != nil {
+			s.Err(w, r, http.StatusInternalServerError, err)
+			s.Logger.Error(err)
+			return
+		}
+
+		i, err := s.store.Image().Download(id)
+		if err != nil {
+			s.Err(w, r, http.StatusInternalServerError, err)
+			s.Logger.Error(err)
+			return
+		}
+
+		fileBytes, err := ioutil.ReadFile(i.Image)
+		if err != nil {
+			s.Err(w, r, http.StatusInternalServerError, err)
+			s.Logger.Error(err)
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+		w.Header().Set("Content-Type", "application/octet-stream")
+		w.Write(fileBytes)
 	})
 }

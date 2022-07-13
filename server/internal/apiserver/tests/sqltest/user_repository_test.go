@@ -10,7 +10,7 @@ import (
 
 func TestUserRepository_Create(t *testing.T) {
 	s, teardown := TestStore(t, dbURL)
-	defer teardown("users")
+	defer teardown("users", "images")
 
 	u, err := s.User().Create(ModelUserTest.TestUser(t))
 	/*if u != nil {
@@ -23,7 +23,7 @@ func TestUserRepository_Create(t *testing.T) {
 
 func TestUserRepository_FindByLogin(t *testing.T) {
 	s, teardown := TestStore(t, dbURL)
-	defer teardown("users")
+	defer teardown("users", "images")
 
 	user := ModelUserTest.TestUser(t)
 	/*if user != nil {
@@ -57,7 +57,7 @@ func TestUserRepository_FindByLogin(t *testing.T) {
 
 func TestUserRepository_Find(t *testing.T) {
 	s, teardown := TestStore(t, dbURL)
-	defer teardown("users")
+	defer teardown("users", "images")
 
 	u := ModelUserTest.TestUser(t)
 	/*if user != nil {

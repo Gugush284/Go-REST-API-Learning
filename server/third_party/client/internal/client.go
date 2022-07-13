@@ -3,6 +3,7 @@ package ServerClient
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
@@ -11,6 +12,8 @@ import (
 	"net/http/cookiejar"
 	"net/url"
 	"os"
+	"strconv"
+	"strings"
 
 	ModelImage "github.com/Gugush284/Go-server.git/internal/apiserver/model/image"
 )
@@ -69,6 +72,19 @@ func CreateRequest() {
 	defer resp.Body.Close()
 
 	log.Println(resp.Header.Get("X-Request-ID"))
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer resp.Body.Close()
+
+	log.Println(resp.Header.Get("X-Request-ID"))
+
+	result := &ModelImage.Image{}
+
+	json.Unmarshal(body, result)
+	log.Println(result)
 }
 
 func WhoamiRequest(cookie []*http.Cookie) {
@@ -115,7 +131,7 @@ func Upload(cookie []*http.Cookie) int {
 
 	w := multipart.NewWriter(&b)
 
-	file, err := os.Open("./third_party/client/assets/testimage.png")
+	file, err := os.Open("./third_party/client/assets/-5b52waeEjc.jpg")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -140,11 +156,11 @@ func Upload(cookie []*http.Cookie) int {
 		Jar: jar,
 	}
 
-	urlObj, _ := url.Parse("http://localhost:8080/private/upload/image")
+	urlObj, _ := url.Parse("http://localhost:8080/private/upload")
 
 	client.Jar.SetCookies(urlObj, cookie)
 
-	req, err := http.NewRequest("POST", "http://localhost:8080/private/upload/image", &b)
+	req, err := http.NewRequest("POST", "http://localhost:8080/private/upload", &b)
 	if err != nil {
 		log.Fatalf("Got error %s", err.Error())
 		return 0
@@ -169,4 +185,26 @@ func Upload(cookie []*http.Cookie) int {
 	json.Unmarshal(body, result)
 	log.Println(result)
 	return result.ImageId
+}
+
+func Download(id int) {
+
+	res, err := http.Get(strings.Join([]string{
+		"http://localhost:8080/download",
+		strconv.Itoa(id)},
+		"/"))
+	if err != nil {
+		log.Fatalf("Got error %s", err.Error())
+		return
+	}
+
+	log.Println(res)
+	log.Println(res.Body)
+
+	defer res.Body.Close()
+
+	img, _ := os.Create("image.jpg")
+
+	b, _ := io.Copy(img, res.Body)
+	fmt.Println("File size: ", b)
 }

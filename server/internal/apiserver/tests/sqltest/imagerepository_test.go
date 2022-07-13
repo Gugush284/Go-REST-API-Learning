@@ -9,7 +9,7 @@ import (
 
 func TestImageRepository_Upload(t *testing.T) {
 	s, teardown := TestStore(t, dbURL)
-	defer teardown("users")
+	defer teardown("users", "images")
 
 	testcases := []struct {
 		image string
@@ -65,4 +65,23 @@ func TestImageRepository_Upload(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestImageRepository_Download(t *testing.T) {
+	s, _ := TestStore(t, dbURL)
+	//defer teardown("users", "images")
+
+	i := &ModelImage.Image{
+		Image:     "filepath",
+		Txt:       "description",
+		ImageName: "example",
+	}
+
+	err := s.Image().Upload(i)
+	assert.NoError(t, err)
+	assert.NotNil(t, i)
+
+	im, err := s.Image().Download(i.ImageId)
+	assert.NoError(t, err)
+	assert.Equal(t, i, im)
 }

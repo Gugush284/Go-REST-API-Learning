@@ -55,7 +55,7 @@ func (r *ImageRepository) Download(id int) (*ModelImage.Image, error) {
 	i := &ModelImage.Image{}
 
 	row := r.store.Db.QueryRow(
-		"SELECT image, image_name, txt FROM users WHERE image_id = (?)",
+		"SELECT image, image_name, txt FROM images WHERE image_id = (?)",
 		id)
 	if err := row.Scan(&i.Image, &i.ImageName, &i.Txt); err != nil {
 		if err == sql.ErrNoRows {
@@ -64,6 +64,8 @@ func (r *ImageRepository) Download(id int) (*ModelImage.Image, error) {
 
 		return nil, err
 	}
+
+	i.ImageId = id
 
 	return i, nil
 }

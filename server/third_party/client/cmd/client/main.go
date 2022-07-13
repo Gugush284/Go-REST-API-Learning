@@ -22,6 +22,7 @@ func main() {
 	log.Println("Upload")
 	id := ServerClient.Upload(cookie)
 	if id != 0 {
-
+		log.Println("Download")
+		ServerClient.Download(id)
 	}
 }

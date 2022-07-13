@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
@@ -14,6 +15,7 @@ import (
 	Constants "github.com/Gugush284/Go-server.git/internal/apiserver"
 	"github.com/Gugush284/Go-server.git/internal/apiserver/apiserver"
 	"github.com/Gugush284/Go-server.git/internal/apiserver/store/teststore"
+	ModelImageTest "github.com/Gugush284/Go-server.git/internal/apiserver/tests/model/image"
 	ModelUserTest "github.com/Gugush284/Go-server.git/internal/apiserver/tests/model/users"
 	"github.com/gorilla/securecookie"
 	"github.com/gorilla/sessions"
@@ -163,7 +165,7 @@ func TestServer_HandleUpload(t *testing.T) {
 	w.Close()
 
 	rec := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodPost, "/private/upload/image", &b)
+	req, _ := http.NewRequest(http.MethodPost, "/private/upload", &b)
 
 	cookieStr, _ := sc.Encode(Constants.SessionName, cookieValue)
 	req.Header.Set("Cookie", fmt.Sprintf("%s=%s", Constants.SessionName, cookieStr))
@@ -176,6 +178,42 @@ func TestServer_HandleUpload(t *testing.T) {
 	json.NewDecoder(rec.Body).Decode(&result)
 	s.Logger.Info(result)
 	assert.Equal(t, http.StatusCreated, rec.Code)
+}
+
+func TestServer_HandleDownload(t *testing.T) {
+	storage := teststore.New()
+	s := apiserver.NewServer(storage, sessions.NewCookieStore([]byte("secret")))
+
+	sc := securecookie.New([]byte("secret"), nil)
+
+	u := ModelUserTest.TestUser(t)
+	u, err := storage.User().Create(u)
+	assert.NoError(t, err)
+	assert.NotNil(t, u)
+
+	cookieValue := map[interface{}]interface{}{
+		"user_id": u.ID,
+	}
+
+	i := ModelImageTest.TestImage(t)
+	storage.Image().Upload(i)
+
+	rec := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodGet, "/private/download/2", nil)
+
+	cookieStr, _ := sc.Encode(Constants.SessionName, cookieValue)
+	req.Header.Set("Cookie", fmt.Sprintf("%s=%s", Constants.SessionName, cookieStr))
+
+	s.ServeHTTP(rec, req)
+
+	body, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		s.Logger.Fatal(err)
+	}
+	defer req.Body.Close()
+
+	s.Logger.Info(string(body))
+	assert.Equal(t, http.StatusOK, rec.Code)
 }
 
 func TestServer_AuthenticateUser(t *testing.T) {

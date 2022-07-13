@@ -41,12 +41,12 @@ func (s *server) configureRouter() {
 	s.router.Use(handlers.CORS(handlers.AllowedOrigins([]string{"*"})))
 	s.router.HandleFunc("/users", s.handleUsersCreate()).Methods("POST")
 	s.router.HandleFunc("/sessions", s.handleSessionsCreate()).Methods("POST")
+	s.router.HandleFunc("/download/{key}", s.Download()).Methods("GET")
 
 	private := s.router.PathPrefix("/private").Subrouter()
 	private.Use(s.AuthenticateUser)
 	private.HandleFunc("/whoami", s.handleWhoami()).Methods("GET")
-	private.HandleFunc("/upload/image", s.UploadImage()).Methods("POST")
-	private.HandleFunc("/upload/download/", s.UploadImage()).Methods("POST")
+	private.HandleFunc("/upload", s.UploadImage()).Methods("POST")
 }
 
 func (s *server) configureLogger(config *Config) error {
