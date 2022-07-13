@@ -3,3 +3,4 @@ server/.vscode
 .vscode
 server/client.exe
 server/configs/SessionKey.toml
+server/internal/apiserver/tests/server/assets
