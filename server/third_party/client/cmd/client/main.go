@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 
-	ServerClient "github.com/Gugush284/Go-server.git/internal/client"
+	ServerClient "github.com/Gugush284/Go-server.git/third_party/client/internal"
 )
 
 func main() {
@@ -18,4 +18,10 @@ func main() {
 
 	log.Println("WhoamiRequest")
 	ServerClient.WhoamiRequest(cookie)
+
+	log.Println("Upload")
+	id := ServerClient.Upload(cookie)
+	if id != 0 {
+
+	}
 }

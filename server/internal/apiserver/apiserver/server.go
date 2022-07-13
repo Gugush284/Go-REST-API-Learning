@@ -46,6 +46,7 @@ func (s *server) configureRouter() {
 	private.Use(s.AuthenticateUser)
 	private.HandleFunc("/whoami", s.handleWhoami()).Methods("GET")
 	private.HandleFunc("/upload/image", s.UploadImage()).Methods("POST")
+	private.HandleFunc("/upload/download/", s.UploadImage()).Methods("POST")
 }
 
 func (s *server) configureLogger(config *Config) error {

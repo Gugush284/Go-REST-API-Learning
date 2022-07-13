@@ -87,7 +87,6 @@ func (s *SqlStore) CreateTables() error {
 
 	statement, err = s.Db.Prepare(`create table IF NOT EXISTS images (
 		image_id        integer     not null PRIMARY KEY AUTO_INCREMENT,
-		image_type      varchar(25) not null default '',
 		image           varchar(50) not null default '',
 		image_name      varchar(50) not null default '',
 		txt				Text		not null

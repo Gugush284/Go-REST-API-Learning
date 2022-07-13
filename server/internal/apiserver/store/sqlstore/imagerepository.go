@@ -1,6 +1,8 @@
 package sqlstore
 
 import (
+	"database/sql"
+
 	Constants "github.com/Gugush284/Go-server.git/internal/apiserver"
 	ModelImage "github.com/Gugush284/Go-server.git/internal/apiserver/model/image"
 )
@@ -41,4 +43,27 @@ func (r *ImageRepository) Upload(i *ModelImage.Image) error {
 	i.ImageId = int(id)
 
 	return nil
+}
+
+func (r *ImageRepository) Download(id int) (*ModelImage.Image, error) {
+	if err := r.store.Db.Ping(); err != nil {
+		if err := r.store.Open(); err != nil {
+			return nil, err
+		}
+	}
+
+	i := &ModelImage.Image{}
+
+	row := r.store.Db.QueryRow(
+		"SELECT image, image_name, txt FROM users WHERE image_id = (?)",
+		id)
+	if err := row.Scan(&i.Image, &i.ImageName, &i.Txt); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, Constants.ErrRecordNotFound
+		}
+
+		return nil, err
+	}
+
+	return i, nil
 }

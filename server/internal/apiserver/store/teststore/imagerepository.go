@@ -19,3 +19,7 @@ func (r *ImageRepository) Upload(i *ModelImage.Image) error {
 
 	return nil
 }
+
+func (r *ImageRepository) Download(id int) (*ModelImage.Image, error) {
+	return r.imagesID[id], nil
+}

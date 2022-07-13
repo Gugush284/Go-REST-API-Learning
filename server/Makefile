@@ -18,7 +18,7 @@ build_run_server:
 
 .PHONY: buildclient
 buildclient:
-	go build -v ./cmd/client
+	go build -v ./third_party/client/cmd/client
 
 
 
@@ -30,7 +30,7 @@ runclient:
 
 .PHONY: build_run_client
 build_run_client:
-	go build -v ./cmd/client
+	go build -v ./third_party/client/cmd/client
 	./client.exe
 
 

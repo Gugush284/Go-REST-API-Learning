@@ -13,4 +13,5 @@ type UserRepository interface {
 
 type ImageRepository interface {
 	Upload(i *ModelImage.Image) error
+	Download(id int) (*ModelImage.Image, error)
 }

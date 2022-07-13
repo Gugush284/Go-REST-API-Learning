@@ -26,13 +26,6 @@ func TestImageRepository_Upload(t *testing.T) {
 			err:   false,
 		},
 		{
-			name:  "no type",
-			image: "filepath",
-			txt:   "description",
-			iname: "example",
-			err:   true,
-		},
-		{
 			name:  "no path",
 			image: "",
 			txt:   "description",
