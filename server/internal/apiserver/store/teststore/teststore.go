@@ -1,6 +1,7 @@
 package teststore
 
 import (
+	ModelImage "github.com/Gugush284/Go-server.git/internal/apiserver/model/image"
 	model_user "github.com/Gugush284/Go-server.git/internal/apiserver/model/user"
 	"github.com/Gugush284/Go-server.git/internal/apiserver/store"
 )
@@ -38,7 +39,8 @@ func (s *TestStore) Image() store.ImageRepository {
 	}
 
 	s.imageRepository = &ImageRepository{
-		store: s,
+		store:    s,
+		imagesID: make(map[int]*ModelImage.Image),
 	}
 
 	return s.imageRepository

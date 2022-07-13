@@ -1,6 +1,8 @@
 package teststore
 
-import ModelImage "github.com/Gugush284/Go-server.git/internal/apiserver/model/image"
+import (
+	ModelImage "github.com/Gugush284/Go-server.git/internal/apiserver/model/image"
+)
 
 type ImageRepository struct {
 	store    *TestStore
@@ -12,7 +14,7 @@ func (r *ImageRepository) Upload(i *ModelImage.Image) error {
 		return err
 	}
 
-	i.ImageId = len(r.imagesID) + 1
+	i.ImageId = 1
 	r.imagesID[i.ImageId] = i
 
 	return nil

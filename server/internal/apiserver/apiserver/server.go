@@ -45,6 +45,7 @@ func (s *server) configureRouter() {
 	private := s.router.PathPrefix("/private").Subrouter()
 	private.Use(s.AuthenticateUser)
 	private.HandleFunc("/whoami", s.handleWhoami()).Methods("GET")
+	private.HandleFunc("/upload/image", s.UploadImage()).Methods("POST")
 }
 
 func (s *server) configureLogger(config *Config) error {

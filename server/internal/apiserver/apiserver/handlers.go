@@ -3,10 +3,14 @@ package apiserver
 import (
 	"context"
 	"encoding/json"
+	"io"
 	"net/http"
+	"os"
+	"strings"
 	"time"
 
 	Constants "github.com/Gugush284/Go-server.git/internal/apiserver"
+	ModelImage "github.com/Gugush284/Go-server.git/internal/apiserver/model/image"
 	ModelUser "github.com/Gugush284/Go-server.git/internal/apiserver/model/user"
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
@@ -138,8 +142,47 @@ func (s *server) logRequest(next http.Handler) http.Handler {
 	})
 }
 
-/*func (s *server) UploadImage() http.HandlerFunc {
+func (s *server) UploadImage() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		s.respond(w, r, http.StatusOK, r.Context().Value(Constants.CtxKeyUser).(*ModelUser.User))
+		file, header, err := r.FormFile("image")
+		if err != nil {
+			s.Err(w, r, http.StatusUnprocessableEntity, err)
+			s.Logger.Error(err)
+			return
+		}
+		defer file.Close()
+
+		path := strings.Join([]string{"assets", header.Filename}, "/")
+		localFile, err := os.Create(path)
+		if err != nil {
+			s.Err(w, r, http.StatusInternalServerError, err)
+			s.Logger.Error(err)
+			return
+		}
+		defer localFile.Close()
+
+		_, err = io.Copy(localFile, file)
+		if err != nil {
+			s.Err(w, r, http.StatusInternalServerError, err)
+			s.Logger.Error(err)
+			return
+		}
+
+		i := &ModelImage.Image{
+			ImageName: header.Filename,
+			Image:     path,
+			Txt:       "-",
+		}
+
+		if err := s.store.Image().Upload(i); err != nil {
+			s.Err(w, r, http.StatusInternalServerError, err)
+			s.Logger.Error(err)
+			if err = os.Remove(path); err != nil {
+				s.Logger.Error(err)
+			}
+			return
+		}
+
+		s.respond(w, r, http.StatusCreated, i)
 	})
-}*/
+}

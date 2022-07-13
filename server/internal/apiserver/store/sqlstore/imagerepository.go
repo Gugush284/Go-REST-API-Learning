@@ -21,8 +21,7 @@ func (r *ImageRepository) Upload(i *ModelImage.Image) error {
 	}
 
 	statement, err := r.store.Db.Exec(
-		"INSERT INTO images (image_type, image, image_name, txt) VALUES (?, ?, ?, ?)",
-		i.ImageType,
+		"INSERT INTO images (image, image_name, txt) VALUES (?, ?, ?)",
 		i.Image,
 		i.ImageName,
 		i.Txt,
