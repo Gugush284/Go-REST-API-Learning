@@ -1,5 +1,5 @@
 # Go-server
-A simple Go server - in progress
+A simple Go server
 ## List of packages used
 - github.com/BurntSushi/toml
 -	github.com/asaskevich/govalidator
